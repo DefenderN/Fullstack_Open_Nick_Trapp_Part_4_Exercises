@@ -19,6 +19,12 @@ const Blog = mongoose.model('Blog', blogSchema)
 
 const mongoUrl = process.env.MONGODB_URI
 mongoose.connect(mongoUrl)
+  .then(result => {
+    console.log('Connected to MongoDB')
+  })
+  .catch(error => {
+    console.log('error connecting to MongoDB:', error.message)
+  })
 
 // Middleware
 app.use(cors())
@@ -32,16 +38,17 @@ app.get('/api/blogs', (request, response) => {
     .then(blogs => {
       response.json(blogs)
     })
+    .catch((error) => console.log("Error occurred: ", error))
 })
 
 app.post('/api/blogs', (request, response) => {
   const blog = new Blog(request.body)
-
   blog
     .save()
     .then(result => {
       response.status(201).json(result)
     })
+    .catch((error) => console.log("Error occurred: ", error))
 })
 
 // Running the server

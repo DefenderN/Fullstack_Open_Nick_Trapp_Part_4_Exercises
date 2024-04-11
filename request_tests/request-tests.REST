@@ -1,5 +1,16 @@
-### GET
-http://localhost:3003/
+### GET Hello World example Page
+GET http://localhost:3003/
 
 ### GET
-http://localhost:3003/api/blogs
+GET http://localhost:3003/api/blogs
+
+### POST
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Blogentry 1",
+  "author": "Peter Parker 1",
+  "url": "urlplaceholder",
+  "likes": 25
+}
