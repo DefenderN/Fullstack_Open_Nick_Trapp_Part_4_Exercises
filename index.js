@@ -15,7 +15,7 @@ const blogSchema = new mongoose.Schema({
 
 const Blog = mongoose.model('Blog', blogSchema)
 
-const mongoUrl = 'mongodb://localhost/bloglist'
+const mongoUrl = `mongodb+srv://fullstackuser:<password>@fullstackopendb1.qre0tv4.mongodb.net/BlogApp?retryWrites=true&w=majority&appName=fullstackopendb1`
 mongoose.connect(mongoUrl)
 
 // Middleware
