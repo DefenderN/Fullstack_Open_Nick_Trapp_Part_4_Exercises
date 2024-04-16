@@ -1,7 +1,7 @@
 ### GET Hello World example Page
 GET http://localhost:3003/
 
-### GET
+### GET all blogs
 GET http://localhost:3003/api/blogs
 
 ### POST
@@ -10,6 +10,23 @@ Content-Type: application/json
 
 {
   "title": "Blogentry 1",
+  "author": "Peter Parker 1",
+  "url": "urlplaceholder",
+  "likes": 25
+}
+
+### GET single blog
+GET http://localhost:3003/api/blogs/661ec8dc7d0f89b0dd505f8b
+
+### DELETE single blog
+DELETE http://localhost:3003/api/blogs/661ec8dc7d0f89b0dd505f8b
+
+### Update existing blog
+PUT http://localhost:3003/api/blogs/6617a992c28515c01010a41a
+Content-Type: application/json
+
+{
+  "title": "UPDATED BLOG ENTRY NAME",
   "author": "Peter Parker 1",
   "url": "urlplaceholder",
   "likes": 25
