@@ -4,7 +4,8 @@ const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
 const logger = require('./utils/logger') // Import centralized logging module
-const config = require('./utils/config')
+const config = require('./utils/config') // Import centralized config module, e.g. handling environment variables
+const middleware = require('./utils/middleware') // Import custom middleware
 
 
 // Mongoose setup
@@ -26,9 +27,10 @@ mongoose.connect(config.MONGODB_URI)
     logger.error('Error connecting to MongoDB:', error.message)
   })
 
-// Middleware
+// Middleware BEFORE Routes
 app.use(cors())
 app.use(express.json())
+app.use(middleware.requestLogger)
 
 // API Routes
 app.get('/api/blogs', (request, response) => {
@@ -49,6 +51,10 @@ app.post('/api/blogs', (request, response) => {
     })
     .catch((error) => logger.error("Error occurred: ", error))
 })
+
+// Middleware AFTER Routes
+app.use(middleware.unknownEndpoint)
+app.use(middleware.errorHandler)
 
 // Export statement
 module.exports = app
