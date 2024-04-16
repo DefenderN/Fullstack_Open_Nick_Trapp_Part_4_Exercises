@@ -1,10 +1,10 @@
 // Import statements
-// import dotenv library to handle environment variables
-require('dotenv').config()
+require('dotenv').config() // import dotenv library to handle environment variables
 const express = require('express')
 const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
+const logger = require('./utils/logger') // Import centralized logging module
 
 
 // Mongoose setup
@@ -15,15 +15,16 @@ const blogSchema = new mongoose.Schema({
   likes: Number
 })
 
+// Create Blog object to handle DB requests
 const Blog = mongoose.model('Blog', blogSchema)
 
 const mongoUrl = process.env.MONGODB_URI
 mongoose.connect(mongoUrl)
   .then(result => {
-    console.log('Connected to MongoDB')
+    logger.info('Connected to MongoDB')
   })
   .catch(error => {
-    console.log('error connecting to MongoDB:', error.message)
+    logger.error('Error connecting to MongoDB:', error.message)
   })
 
 // Middleware
@@ -38,7 +39,7 @@ app.get('/api/blogs', (request, response) => {
     .then(blogs => {
       response.json(blogs)
     })
-    .catch((error) => console.log("Error occurred: ", error))
+    .catch((error) => logger.error("Error occurred: ", error))
 })
 
 app.post('/api/blogs', (request, response) => {
@@ -48,11 +49,11 @@ app.post('/api/blogs', (request, response) => {
     .then(result => {
       response.status(201).json(result)
     })
-    .catch((error) => console.log("Error occurred: ", error))
+    .catch((error) => logger.error("Error occurred: ", error))
 })
 
 // Running the server
 const PORT = 3003
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+  logger.info(`Server running on port ${PORT}`)
 })
