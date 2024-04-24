@@ -82,3 +82,71 @@ describe("total likes", () => {
         assert.strictEqual(result, 35)
     })
 })
+
+// define a test suite to test the favoriteBlog function properly
+describe("favorite blog", () => {
+  
+  test("of a list with multiple blogs", () => {
+    // Define test data
+    const theFavoriteBlog = {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Go To Statement Considered Harmful',
+      author: 'Edsger W. Dijkstra',
+      url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+      likes: 20,
+      __v: 0
+    }
+    const anotherBlog = {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Go To Statement Considered Harmful',
+      author: 'Edsger W. Dijkstra',
+      url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+      likes: 5,
+      __v: 0
+    }
+
+    const anotherBlog2 = {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Go To Statement Considered Harmful',
+      author: 'Edsger W. Dijkstra',
+      url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+      likes: 10,
+      __v: 0
+    }
+
+    // Blogs-Array with multiple blogs
+    const blogs = [theFavoriteBlog, anotherBlog, anotherBlog2]
+    // collect result of tested function
+    const result = listHelper.favoriteBlog(blogs)
+    // compare function result to expected result
+    assert.deepStrictEqual(result, theFavoriteBlog)
+  })
+
+  test("of a list with only one blog", () => {
+    // Define test data
+    const theFavoriteBlog = {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Go To Statement Considered Harmful',
+      author: 'Edsger W. Dijkstra',
+      url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+      likes: 20,
+      __v: 0
+    }
+    // Blogs-Array with one blog only
+    const blogs = [theFavoriteBlog]
+    // collect result of tested function
+    const result = listHelper.favoriteBlog(blogs)
+    // compare function result to expected result
+    assert.deepStrictEqual(result, theFavoriteBlog)
+  })
+
+  test("of a list with no blogs", () => {
+    // Define test data
+    // Empty blogs-array 
+    const blogs = []
+    // collect result of tested function
+    const result = listHelper.favoriteBlog(blogs)
+    // compare function result to expected result
+    assert.deepStrictEqual(result, null)
+  })
+})
