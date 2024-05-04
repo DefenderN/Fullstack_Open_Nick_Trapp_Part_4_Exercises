@@ -1,6 +1,6 @@
 const { test, describe } = require('node:test');
 const assert = require('node:assert');
-const listHelper = require("./list_helper")
+const listHelper = require("../utils/list_helper")
 
 // The test function essentially waits for an error to occur when executing the function
 // which is passed as the second argument.
