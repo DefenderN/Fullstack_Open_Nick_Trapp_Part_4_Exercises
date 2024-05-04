@@ -10,7 +10,7 @@ const Blog = require('../models/blog');
 const api = supertest(app)
 
 // Define test suite
-describe.only("API tests", () => {
+describe("API tests", () => {
     // Clean up and initialize the database before each test
     beforeEach(async () => {
         await Blog.deleteMany({});
@@ -52,7 +52,7 @@ describe.only("API tests", () => {
 
     // Test to verify that the returned blog objects from the db contain
     // an id field and not a _id field
-    test.only("blogs have id field and not _id field", async () => {
+    test("blogs have id field and not _id field", async () => {
         const response = await api
                             .get('/api/blogs')
                             .expect(200)
@@ -60,6 +60,27 @@ describe.only("API tests", () => {
         const hasIdFieldName = response.body[0].hasOwnProperty("id")
         assert.equal(hasIdFieldName, true)
         // assert.strictEqual(idFieldName, "_id")
+    })
+
+    test("Test to verify POST request", async () => {
+        // Setup dummy data to insert
+        const newBlog = {
+            title: "New Blog",
+            author: "New Author",
+            url: "http://newblog.com",
+            likes: 0
+        }
+
+        // POST newBlog to DB
+        const response = await api
+                            .post('/api/blogs')
+                            .send(newBlog)
+                            .expect(201)
+
+        const responseBlog = response.body
+        assert.strictEqual(responseBlog.author, "New Author")
+        assert.strictEqual(responseBlog.url, "http://newblog.com")
+        assert.strictEqual(responseBlog.likes, 0)
     })
 
     // Close DB connections after testing
