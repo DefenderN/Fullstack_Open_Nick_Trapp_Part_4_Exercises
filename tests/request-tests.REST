@@ -9,11 +9,21 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-  "title": "Blogentry 1",
-  "author": "Peter Parker 1",
-  "url": "urlplaceholder",
-  "likes": 25
-}
+  "title": "New Blog",
+            "author": "New Author",
+            "url": "http://newblog.com",
+            "likes": 10
+        }
+
+### POST Blog without title
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Hello world",
+  "author": "New Author",
+  "likes": 10
+        }
 
 ### GET single blog
 GET http://localhost:3003/api/blogs/661ec8dc7d0f89b0dd505f8b

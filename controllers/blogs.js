@@ -36,6 +36,10 @@ blogsRouter.get('/:id', (request, response, next) => {
 
 // Add a new blog
 blogsRouter.post('/', (request, response, next) => {
+    // Check if the title or url of the blog is missing.
+    if (!request.body.title || !request.body.url){
+        return response.status(400).json({ error: 'Title and URL are required' });
+    }
 
     // Create new Blog object
     const blog = new Blog({

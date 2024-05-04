@@ -14,7 +14,7 @@ describe("API tests", () => {
     // Clean up and initialize the database before each test
     beforeEach(async () => {
         await Blog.deleteMany({});
-        console.log("DB has been deleted")
+        
         // Create an array of dummy blog entries
         const blogEntries = [
             { title: "Blog 1", author: "Author 1", url: "http://example.com/1", likes: 10 },
@@ -29,7 +29,6 @@ describe("API tests", () => {
 
         // Insert the dummy blogs into the database
         await Blog.insertMany(blogEntries);
-        console.log("Many blogs were inserted")
     });
 
     // Test to verify the the blogs are returned in json format
@@ -102,6 +101,42 @@ describe("API tests", () => {
         const responseBlog = response.body
         assert.strictEqual(responseBlog.hasOwnProperty("likes"), true)
         assert.strictEqual(responseBlog.likes, 0)
+    })
+
+    test("Missing title or url properties result in status code 400 Bad Request", async () => {
+
+        /**
+         * Create 3 dummy blogs:
+         *   #  title? url?
+         *   1  NO     YES
+         *   2  YES    NO
+         *   3  NO     NO
+         */
+
+        const maliciousBlogs = [
+            {
+                author: "Another Author",
+                url: "http://newblog.com",
+                likes: 0
+            },
+            {
+                title: "New Blog",
+                author: "New Author",
+                likes: 0
+            },
+            {
+                author: "New Author",
+                likes: 0
+            }]
+
+        // Post each dummy blog to the DB
+        // Assert that every POST Request returns a 400 code
+        for (const blog of maliciousBlogs) {
+            const response = await api
+                .post('/api/blogs')
+                .send(blog)
+                .expect(400);
+        }
     })
 
     // Close DB connections after testing
