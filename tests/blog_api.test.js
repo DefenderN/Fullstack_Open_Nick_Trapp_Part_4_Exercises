@@ -10,7 +10,7 @@ const Blog = require('../models/blog');
 const api = supertest(app)
 
 // Define test suite
-describe("API tests",() => {
+describe.only("API tests", () => {
     // Clean up and initialize the database before each test
     beforeEach(async () => {
         await Blog.deleteMany({});
@@ -32,16 +32,35 @@ describe("API tests",() => {
         console.log("Many blogs were inserted")
     });
 
-
-    // Test to verify the correct amount of blogs returned in JSON format
-    test('there are exactly 6 blogs', async () => {
+    // Test to verify the the blogs are returned in json format
+    test('blogs are returned in JSON foramt', async () => {
         const response = await api
             .get('/api/blogs')
             .expect(200)
             .expect('Content-Type', /application\/json/)
+    });
+
+    // Test to verify the correct amount of blogs is returned
+    test('there are exactly 6 blogs', async () => {
+        const response = await api
+            .get('/api/blogs')
+            .expect(200)  
         
+        // Verify response length 
         assert.strictEqual(response.body.length, 6)
     });
+
+    // Test to verify that the returned blog objects from the db contain
+    // an id field and not a _id field
+    test.only("blogs have id field and not _id field", async () => {
+        const response = await api
+                            .get('/api/blogs')
+                            .expect(200)
+
+        const hasIdFieldName = response.body[0].hasOwnProperty("id")
+        assert.equal(hasIdFieldName, true)
+        // assert.strictEqual(idFieldName, "_id")
+    })
 
     // Close DB connections after testing
     after(async () => {
