@@ -58,7 +58,7 @@ describe("API tests", () => {
                             .expect(200)
 
         const hasIdFieldName = response.body[0].hasOwnProperty("id")
-        assert.equal(hasIdFieldName, true)
+        assert.strictEqual(hasIdFieldName, true)
         // assert.strictEqual(idFieldName, "_id")
     })
 
@@ -80,6 +80,27 @@ describe("API tests", () => {
         const responseBlog = response.body
         assert.strictEqual(responseBlog.author, "New Author")
         assert.strictEqual(responseBlog.url, "http://newblog.com")
+        assert.strictEqual(responseBlog.likes, 0)
+    })
+
+    test("Verify that the likes property defaults to zero if missing", async () => {
+
+        // Create dummyBlog with no likes property
+        const blogWithoutLikes = {
+            title: "New Blog",
+            author: "New Author",
+            url: "http://newblog.com"
+        }
+        // Post dummyBlog to DB
+        const response = await api
+                            .post('/api/blogs')
+                            .send(blogWithoutLikes)
+                            .expect(201)
+
+        // Evaluate that the likes property of the response body
+        // was changed to 0
+        const responseBlog = response.body
+        assert.strictEqual(responseBlog.hasOwnProperty("likes"), true)
         assert.strictEqual(responseBlog.likes, 0)
     })
 
