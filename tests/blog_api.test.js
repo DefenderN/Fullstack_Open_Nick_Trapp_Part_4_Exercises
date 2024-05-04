@@ -10,7 +10,7 @@ const Blog = require('../models/blog');
 const api = supertest(app)
 
 // Define test suite
-describe("API tests", () => {
+describe("When it comes to API calls", () => {
     // Clean up and initialize the database before each test
     beforeEach(async () => {
         await Blog.deleteMany({});
@@ -32,7 +32,7 @@ describe("API tests", () => {
     });
 
     // Test to verify the the blogs are returned in json format
-    test('blogs are returned in JSON foramt', async () => {
+    test('blogs are returned in JSON format', async () => {
         const response = await api
             .get('/api/blogs')
             .expect(200)
@@ -40,7 +40,7 @@ describe("API tests", () => {
     });
 
     // Test to verify the correct amount of blogs is returned
-    test('there are exactly 6 blogs', async () => {
+    test('blogs are properly added to the DB', async () => {
         const response = await api
             .get('/api/blogs')
             .expect(200)  
@@ -51,7 +51,7 @@ describe("API tests", () => {
 
     // Test to verify that the returned blog objects from the db contain
     // an id field and not a _id field
-    test("blogs have id field and not _id field", async () => {
+    test("blogs have an id field and not an _id field", async () => {
         const response = await api
                             .get('/api/blogs')
                             .expect(200)
@@ -61,13 +61,13 @@ describe("API tests", () => {
         // assert.strictEqual(idFieldName, "_id")
     })
 
-    test("Test to verify POST request", async () => {
+    test("a blog POST request returns status code 200", async () => {
         // Setup dummy data to insert
         const newBlog = {
             title: "New Blog",
             author: "New Author",
             url: "http://newblog.com",
-            likes: 0
+            likes: 10
         }
 
         // POST newBlog to DB
@@ -79,10 +79,10 @@ describe("API tests", () => {
         const responseBlog = response.body
         assert.strictEqual(responseBlog.author, "New Author")
         assert.strictEqual(responseBlog.url, "http://newblog.com")
-        assert.strictEqual(responseBlog.likes, 0)
+        assert.strictEqual(responseBlog.likes, 10)
     })
 
-    test("Verify that the likes property defaults to zero if missing", async () => {
+    test("the likes property defaults to zero if it is missing", async () => {
 
         // Create dummyBlog with no likes property
         const blogWithoutLikes = {
@@ -103,7 +103,7 @@ describe("API tests", () => {
         assert.strictEqual(responseBlog.likes, 0)
     })
 
-    test("Missing title or url properties result in status code 400 Bad Request", async () => {
+    test("a missing title or url property results in status code 400 Bad Request", async () => {
 
         /**
          * Create 3 dummy blogs:

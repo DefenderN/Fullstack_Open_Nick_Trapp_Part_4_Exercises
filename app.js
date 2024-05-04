@@ -10,7 +10,6 @@ const blogsRouter = require('./controllers/blogs') // Import Route controller fo
 
 // Settings
 mongoose.set('strictQuery', false)
-
 // Connect to MongoDB
 logger.info('connecting to', config.MONGODB_URI)
 mongoose.connect(config.MONGODB_URI)

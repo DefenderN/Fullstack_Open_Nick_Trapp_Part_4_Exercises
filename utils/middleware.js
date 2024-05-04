@@ -3,13 +3,16 @@
 
 // Import statements
 const logger = require('./logger')
+const config = require('./config') // Import centralized config module, e.g. handling environment variables
 
 // Middleware for logging requests
 const requestLogger = (request, response, next) => {
-    logger.info('Method', request.method)
-    logger.info('Path:  ', request.path)
-    logger.info('Body:  ', request.body)
-    logger.info('---')
+  if (config.APP_STATUS === 'development'){
+      logger.info('Method', request.method)
+      logger.info('Path:  ', request.path)
+      logger.info('Body:  ', request.body)
+      logger.info('---')
+    }
     next() // Forward the request to the next middleware
 }
 
