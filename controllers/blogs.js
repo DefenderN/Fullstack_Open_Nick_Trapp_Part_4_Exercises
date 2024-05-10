@@ -60,8 +60,12 @@ blogsRouter.post('/', (request, response, next) => {
 // DELETE a blog
 blogsRouter.delete('/:id', (request, response, next) => {
     Blog.findByIdAndDelete(request.params.id)
-      .then(() => {
-        response.status(204).end()
+      .then((deletedBlog) => {
+        if (deletedBlog) {
+            response.status(204).end()
+        } else {
+            response.status(404).end()
+        }
       })
       .catch(error => next(error))
 })

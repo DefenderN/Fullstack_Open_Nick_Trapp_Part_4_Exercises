@@ -9,7 +9,7 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-  "title": "New Blog",
+  "title": "Nexxxxw Blog",
             "author": "New Author",
             "url": "http://newblog.com",
             "likes": 10
@@ -26,10 +26,10 @@ Content-Type: application/json
         }
 
 ### GET single blog
-GET http://localhost:3003/api/blogs/661ec8dc7d0f89b0dd505f8b
+GET http://localhost:3003/api/blogs/663e2f9e96f2423af7450455
 
 ### DELETE single blog
-DELETE http://localhost:3003/api/blogs/661ec8dc7d0f89b0dd505f8b
+DELETE http://localhost:3003/api/blogs/663e324c8b4a0061fb228949
 
 ### Update existing blog
 PUT http://localhost:3003/api/blogs/6617a992c28515c01010a41a
@@ -40,4 +40,15 @@ Content-Type: application/json
   "author": "Peter Parker 1",
   "url": "urlplaceholder",
   "likes": 25
+}
+
+### POST blog with unique ID
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{"_id": "1234567890",
+  "title": "Unique ID Blog",
+  "author": "New Author",
+  "url": "http://newblog.com",
+  "likes": 10
 }

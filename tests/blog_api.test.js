@@ -55,10 +55,10 @@ describe("When it comes to API calls", () => {
         const response = await api
                             .get('/api/blogs')
                             .expect(200)
-
-        const hasIdFieldName = response.body[0].hasOwnProperty("id")
-        assert.strictEqual(hasIdFieldName, true)
-        // assert.strictEqual(idFieldName, "_id")
+        const hasIDFieldName = response.body[0].hasOwnProperty("id")
+        assert.strictEqual(hasIDFieldName, true)
+        const has_IDFieldName = response.body[0].hasOwnProperty("_id")
+        assert.strictEqual(has_IDFieldName, false)
     })
 
     test("a blog POST request returns status code 200", async () => {
@@ -137,6 +137,44 @@ describe("When it comes to API calls", () => {
                 .send(blog)
                 .expect(400);
         }
+    })
+
+    test("A DELETE request deletes a blog entry", async () => {
+
+        // 0) Create dummy blog
+        const dummyBlog = {
+            title: "Dummy Blog",
+            author: "To be DELETED",
+            url: "http://newblog.com",
+            likes: 1000000
+        }
+        // 1) Add dummy blog to DB and 
+        //    confirm that dummy blog was added to the DB
+        const postResponse = await api
+            .post('/api/blogs')
+            .send(dummyBlog)
+            .expect(201)
+
+        // Reference custom ID to delete entry in a few moments from now
+        const responseBlog = postResponse.body
+        const dummyBlogID = responseBlog.id
+
+        assert.strictEqual(responseBlog.title, "Dummy Blog")
+        assert.strictEqual(responseBlog.author, "To be DELETED")
+        assert.strictEqual(responseBlog.url, "http://newblog.com")
+        assert.strictEqual(responseBlog.likes, 1000000)
+
+        // 3) Make a DELETE request for the id of the dummy blog
+        //    and verify statuscode 204
+        const deleteResponse = await api
+            .delete(`/api/blogs/${dummyBlogID}`)
+            .expect(204)        
+
+        // 4) Verify that a GET request with the id of the dummy blog
+        //    returns 404 not found, proofing the deletion of the dummy blog
+        const getResponse = await api
+            .get(`/api/blogs/${dummyBlogID}`)
+            .expect(404)
     })
 
     // Close DB connections after testing
