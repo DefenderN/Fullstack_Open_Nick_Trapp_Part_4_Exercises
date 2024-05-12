@@ -58,21 +58,18 @@ blogsRouter.post('/', (request, response, next) => {
 })
 
 // DELETE a blog
-blogsRouter.delete('/:id', (request, response, next) => {
-    Blog.findByIdAndDelete(request.params.id)
-      .then((deletedBlog) => {
+blogsRouter.delete('/:id', async (request, response, next) => {
+     const deletedBlog = await Blog.findByIdAndDelete(request.params.id)
         if (deletedBlog) {
             response.status(204).end()
         } else {
             response.status(404).end()
         }
-      })
-      .catch(error => next(error))
 })
 
+
 // Update a blog
-blogsRouter.put('/:id', (request, response, next) => {
-    const body = request.body
+blogsRouter.put('/:id', async (request, response, next) => {
   
     // Create blog object to replace existing one
     const blog = {
@@ -82,11 +79,8 @@ blogsRouter.put('/:id', (request, response, next) => {
         likes: request.body.likes
     }
     // Update the DB with the new Blog object
-    Blog.findByIdAndUpdate(request.params.id, blog, { new: true, runValidators: true })
-      .then(updatedBlog => {
-        response.json(updatedBlog)
-      })
-      .catch(error => next(error))
+    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true, runValidators: true })
+    response.json(updatedBlog)
   })
 
 // Export statements

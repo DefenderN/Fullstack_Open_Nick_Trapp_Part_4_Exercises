@@ -177,6 +177,49 @@ describe("When it comes to API calls", () => {
             .expect(404)
     })
 
+    test("Updating the like count of a blog using the PUT request works", async () => {
+
+        /**
+         * 1) Create initial dummy blog
+         * 2) Update dummy blog
+         * 3) Read the dummy blog and verify change in likes
+         */
+
+        // 0) Create dummy blog
+        const dummyBlogWithNoLikes = {
+            title: "Unfamous blog",
+            author: "not famous et. al",
+            url: "http://newblog.com",
+            likes: 1
+        }
+        
+
+        // 1) Add dummy blog to DB
+        const postResponse = await api
+            .post('/api/blogs')
+            .send(dummyBlogWithNoLikes)
+            .expect(201)
+
+        // Reference custom ID
+        const dummyBlogWithNoLikesID = postResponse.body.id  
+
+        // Create 2nd dummy blog with more likes
+        const dummyBlogWithMoreLikes = {
+            title: "Unfamous blog",
+            author: "not famous et. al",
+            url: "http://newblog.com",
+            likes: 50
+        }
+
+        // Update dummy blog
+        const putResponse = await api
+            .put(`/api/blogs/${dummyBlogWithNoLikesID}`)
+            .send(dummyBlogWithMoreLikes)
+        
+        // Assert likes count of returned object
+        assert.strictEqual(putResponse.body.likes,dummyBlogWithMoreLikes.likes)
+    })
+
     // Close DB connections after testing
     after(async () => {
         await mongoose.connection.close()
