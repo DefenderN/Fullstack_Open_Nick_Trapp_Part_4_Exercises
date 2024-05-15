@@ -35,8 +35,10 @@ const errorHandler = (error, request, response, next) => {
       return response.status(400).json({ error: 'expected `username` to be unique' })
     } else if (error.name === 'ReferenceError') {
       return response.status(400).json({ error: 'user is not defined' })
+    } else if (error.message.includes('data and salt arguments required')) {
+      return response.status(500).json({ error: 'Invalid input data provided for password hashing.' })
     }
-  
+
     next(error) //Forward the error to the next middleware
   }
 
