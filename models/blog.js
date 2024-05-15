@@ -1,6 +1,4 @@
-// Thsi file defines the mongoose schema
-// to use the MongoDB for the Blogs collection
-// and exports a Blog object
+// Mongoose schema to use the MongoDB for the Blogs collection
 
 // Import statements
 const mongoose = require('mongoose')

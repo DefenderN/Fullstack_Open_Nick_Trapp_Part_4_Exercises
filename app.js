@@ -7,6 +7,7 @@ const logger = require('./utils/logger') // Import centralized logging module
 const config = require('./utils/config') // Import centralized config module, e.g. handling environment variables
 const middleware = require('./utils/middleware') // Import custom middleware
 const blogsRouter = require('./controllers/blogs') // Import Route controller for blogs in the DB
+const usersRouter = require('./controllers/users')
 
 // Settings
 mongoose.set('strictQuery', false)
@@ -27,6 +28,7 @@ app.use(middleware.requestLogger)
 
 // Routers
 app.use('/api/blogs', blogsRouter)
+app.use('/api/users',usersRouter)
 
 // Middleware AFTER Routes
 app.use(middleware.unknownEndpoint)

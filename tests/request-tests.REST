@@ -1,3 +1,18 @@
+### GET users from MongoDB
+GET http://localhost:3003/api/users
+
+### POST new user to MongoDB
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+  "username": "XXX_Goblinslayer_XXX_5",
+  "name": "Peter"
+}
+
+### GET invalid pathway from MongoDB
+GET http://localhost:3003/api/userssss
+
 ### GET Hello World example Page
 GET http://localhost:3003/
 

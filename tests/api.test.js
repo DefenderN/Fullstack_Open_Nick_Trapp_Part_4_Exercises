@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog'); 
+const User = require("../models/user")
 
 // Assign the api variable the superagent, by passing the app object to the supertest function.
 const api = supertest(app)
@@ -220,7 +221,62 @@ describe("When it comes to API calls", () => {
         assert.strictEqual(putResponse.body.likes,dummyBlogWithMoreLikes.likes)
     })
 
-    // Close DB connections after testing
+    // Close DB connection after testing
+    // after(async () => {
+    //     await mongoose.connection.close()
+    // })
+})
+
+describe("User API Tests", () => {
+    // Clean up and initialize the database before each test
+    beforeEach(async () => {
+        await User.deleteMany({})
+    })
+
+    test("Create a user", async () => {
+
+        // Create new dummy User
+        const dummyUser = {
+            username: "DefenderN",
+            name: "Nick",
+            password: "secretpassword"
+        }
+        
+        // POST dummyUser to DB
+        const response = await api
+        .post('/api/users')
+        .send(dummyUser)
+        .expect(201)
+
+        // Verify information about saved user
+        const { username, name } = response.body
+        assert.strictEqual(username, dummyUser.username)
+        assert.strictEqual(name, dummyUser.name)
+    })
+
+    test("Creating a user whose username already exists raises an error", async () => {
+
+        // Create dummy User
+        const dummyUser = {
+            username: "Goblinslayer",
+            name: "Nick",
+            password: "secretpassword"
+        }
+        
+        // POST dummy User to DB
+        const firstResponse = await api
+        .post('/api/users')
+        .send(dummyUser)
+        .expect(201)
+
+        // POST dummy User to DB again
+        const secondResponse = await api
+        .post('/api/users')
+        .send(dummyUser)
+        .expect(400)
+    })
+
+    // Close DB connection after testing
     after(async () => {
         await mongoose.connection.close()
     })
