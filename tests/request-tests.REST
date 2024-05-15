@@ -6,9 +6,10 @@ POST http://localhost:3003/api/users
 Content-Type: application/json
 
 {
-  "username": "XXX_Goblinslayer_XXX_5",
+  "username" : "rererero",
   "name": "Peter",
-  "password": "Secretpassword"
+  "password" : "12"
+  
 }
 
 ### GET invalid pathway from MongoDB

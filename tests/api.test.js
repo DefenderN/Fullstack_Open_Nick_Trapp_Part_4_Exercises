@@ -274,7 +274,103 @@ describe("User API Tests", () => {
         .post('/api/users')
         .send(dummyUser)
         .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+        assert.strictEqual(secondResponse.body.error, 'expected `username` to be unique')
     })
+
+    test("No username raises an error", async () => {
+        //TODO
+        // Create dummy User
+        const dummyUser = {
+            name: "Nick",
+            password: "secretpassword"
+        }
+
+        // POST dummy User to DB
+        const response = await api
+            .post('/api/users')
+            .send(dummyUser)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        assert.strictEqual(response.body.error, 'Username is required')
+    })
+    test("Username < 3 letters raises an error", async () => {
+        //TODO
+        // Create dummy User
+        const dummyUser = {
+            username: "AB",
+            name: "Nick",
+            password: "secretpassword"
+        }
+
+        // POST dummy User to DB
+        const response = await api
+            .post('/api/users')
+            .send(dummyUser)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        assert.strictEqual(response.body.error, 'Username must be at least 3 characters')
+    
+    })
+    test("No name raises an error", async () => {
+        //TODO
+        // Create dummy User
+        const dummyUser = {
+            username: "ABCD",
+            password: "secretpassword"
+        }
+
+        // POST dummy User to DB
+        const response = await api
+            .post('/api/users')
+            .send(dummyUser)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        assert.strictEqual(response.body.error, 'Name is required')
+    
+    })
+    test("No password raises an error", async () => {
+        //TODO
+        // Create dummy User
+        const dummyUser = {
+            username: "ABCD",
+            name: "Nick"
+        }
+
+        // POST dummy User to DB
+        const response = await api
+            .post('/api/users')
+            .send(dummyUser)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        assert.strictEqual(response.body.error, 'Password must be at least 3 characters')
+    
+    })
+    test("password < 3 raises an error", async () => {
+        //TODO
+        // Create dummy User
+        const dummyUser = {
+            username: "ABCD",
+            name: "Nick",
+            password: "12"
+        }
+
+        // POST dummy User to DB
+        const response = await api
+            .post('/api/users')
+            .send(dummyUser)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        assert.strictEqual(response.body.error, 'Password must be at least 3 characters')
+    
+    })
+
 
     // Close DB connection after testing
     after(async () => {

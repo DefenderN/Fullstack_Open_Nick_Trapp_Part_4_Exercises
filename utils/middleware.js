@@ -25,9 +25,10 @@ const unknownEndpoint = (request, response) => {
 // Middleware to handle any kind of errors,
 // e.g. from the MongoDB such as "CastError" or "ValidationError"
 const errorHandler = (error, request, response, next) => {
-    logger.error(error.name)  
-    logger.error(error.message)
-    
+    if (config.APP_STATUS === 'development'){
+      logger.error(error.name)  
+      logger.error(error.message)
+    }
   
     if (error.name === 'CastError') {
       return response.status(400).send({ error: 'malformatted id' })
