@@ -18,24 +18,29 @@ const User = require('../models/user') // Import User object to use for MongoDB
 // POST a new user
 usersRouter.post('/', async (request, response, next) => {
     try {
-    // Extract relevant information from the request
-    const { username, name, password } = request.body
+        // Extract relevant information from the request
+        const { username, name, password } = request.body
 
-    // Create passwordHash
-    const saltRounds = 10
-    const passwordHash = await bcrypt.hash(password, saltRounds)
+        // Ensure validity of password (Validity of username and name are checked with the mongoose schema!)
+        if (!password || password.length < 3) {
+           throw new Error('Password must be at least 3 characters long') 
+        }
 
-    // Create new user object
-    const user = new User({
-      username,
-      name,
-      passwordHash
-    })
-    
-    // Add user to MongoDb
-    const savedUser = await user.save()
-    // Response
-    response.status(201).json(savedUser)
+        // Create passwordHash
+        const saltRounds = 10
+        const passwordHash = await bcrypt.hash(password, saltRounds)
+
+        // Create new user object
+        const user = new User({
+        username,
+        name,
+        passwordHash
+        })
+        
+        // Add user to MongoDb
+        const savedUser = await user.save()
+        // Response
+        response.status(201).json(savedUser)
     } catch (error) {
         next(error)
     }
