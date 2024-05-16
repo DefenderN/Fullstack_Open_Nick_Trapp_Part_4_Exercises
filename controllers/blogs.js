@@ -10,15 +10,18 @@
 // Import statements
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog') // Import Blog object to use for MongoDB
+const User = require('../models/user') // Import User object to use for MongoDB
 
 // ROUTES ------
 
 // Get all blogs
-blogsRouter.get('/', (request, response) => {
-    Blog.find({})
-        .then(blogs => {
-            response.json(blogs)
-        })
+blogsRouter.get('/', async (request, response, next) => {
+    try {
+        const blogs = await Blog.find({}).populate('user')
+        response.json(blogs)
+    } catch (error) {
+        next(error)
+    }
 })
 
 // Get an existing blog
@@ -35,26 +38,39 @@ blogsRouter.get('/:id', (request, response, next) => {
 })
 
 // Add a new blog
-blogsRouter.post('/', (request, response, next) => {
+blogsRouter.post('/', async (request, response, next) => {
     // Check if the title or url of the blog is missing.
     if (!request.body.title || !request.body.url){
         return response.status(400).json({ error: 'Title and URL are required' });
     }
 
-    // Create new Blog object
-    const blog = new Blog({
-        title: request.body.title,
-        author: request.body.author,
-        url: request.body.url,
-        likes: request.body.likes ?? 0 //Set likes to 0 if no value is given
-    })
+    try {
+        // Get DUMMY User to put as user to the new blog 
+        // TODO: Change this later for the ACTUAL User
+        const users = await User.find({})
+        const dummyUser = users[0]
+        const dummyUserID = users[0].id
 
-    // Save new blog object to DB
-    blog.save()
-        .then(savedBlog => {
-            response.status(201).json(savedBlog)
+        // Create new Blog object
+        const blog = new Blog({
+            title: request.body.title,
+            author: request.body.author,
+            url: request.body.url,
+            likes: request.body.likes ?? 0, //Set likes to 0 if no value is given
+            user: dummyUserID
         })
-        .catch(error => next(error))
+
+        // Save new blog object to DB
+        const savedBlog = await blog.save()
+
+        // Update the blogs array of the user
+        const updatedUser = await User.findByIdAndUpdate(dummyUserID, { $push: { blogs: savedBlog.id } }, { new: true, runValidators: true });
+
+        // Set response to be the savedBlog
+        response.status(201).json(savedBlog)
+    } catch (error) {
+        next(error)
+    }
 })
 
 // DELETE a blog

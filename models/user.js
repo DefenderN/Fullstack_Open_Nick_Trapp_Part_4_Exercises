@@ -18,7 +18,13 @@ const userSchema = new mongoose.Schema({
     passwordHash: {
         type: String,
         required: true
-    }
+    },
+    blogs:  [
+                { 
+                type: mongoose.Schema.Types.ObjectId, // This adds mongoose functionality to populate this field later on
+                ref: 'Blog'                         
+                }
+            ]
 })
 
 // Modify toJSON method to NOT include __v, Object_ID and passwordHash

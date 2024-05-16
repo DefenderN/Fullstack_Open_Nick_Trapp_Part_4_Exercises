@@ -8,7 +8,11 @@ const blogSchema = new mongoose.Schema({
     title: String,
     author: String,
     url: String,
-    likes: Number
+    likes: Number,
+    user: {
+        type: mongoose.Schema.Types.ObjectId, // This adds mongoose functionality to populate this field later on
+        ref: 'User'                           // by using the ref: 'User' field
+      }
   })
 
 // Modify the schemas toJSON function to clear of the _id and __v properties
