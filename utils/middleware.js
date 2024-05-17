@@ -56,6 +56,9 @@ const errorHandler = (error, request, response, next) => {
     }
      else if (error.message.includes('data and salt arguments required')) {
       return response.status(500).json({ error: 'Invalid input data provided for password hashing.' })
+    } 
+     else if (error.name ===  'JsonWebTokenError') {
+      return response.status(401).json({ error: 'token invalidd' })
     }
 
     next(error) //Forward the error to the next middleware

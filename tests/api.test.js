@@ -41,7 +41,7 @@ describe("When it comes to API calls", () => {
     });
 
     // Test to verify the correct amount of blogs is returned
-    test('blogs are properly added to the DB', async () => {
+    test('blogs get request returns the correct number of blogs in the DB', async () => {
         const response = await api
             .get('/api/blogs')
             .expect(200)  
@@ -62,7 +62,7 @@ describe("When it comes to API calls", () => {
         assert.strictEqual(has_IDFieldName, false)
     })
 
-    test("a blog POST request returns status code 200", async () => {
+    test("a blog POST request returns status code 201", async () => {
         // Setup dummy data to insert
         const newBlog = {
             title: "New Blog",
@@ -70,10 +70,35 @@ describe("When it comes to API calls", () => {
             url: "http://newblog.com",
             likes: 10
         }
+        
+        // Setup dummy user information
+        const dummyUserInformation = {
+            username: "DefenderN2",
+            name: "Nick",
+            password: "12345"
+          }
 
-        // POST newBlog to DB
+        // Create dummyUser 
+        const dummyUserResponse = await api
+                            .post('/api/users')
+                            .send(dummyUserInformation)
+                            .expect(201)
+
+        const dummyUser = dummyUserResponse.body
+
+        // Login with dummyUser credentials
+        const loginResponse = await api
+                            .post('/api/login')
+                            .send({username: dummyUserInformation.username, password: dummyUserInformation.password})
+        
+        // Retrieve token
+        const token = loginResponse.body.token
+
+        // POST new blog to DB using the token
         const response = await api
                             .post('/api/blogs')
+                            .set('Content-Type', 'application/json') // Set Content-Type header
+                            .set('Authorization', `Bearer ${token}`) // Set Authorization header
                             .send(newBlog)
                             .expect(201)
 

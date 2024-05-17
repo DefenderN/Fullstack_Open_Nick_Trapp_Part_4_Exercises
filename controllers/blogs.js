@@ -11,6 +11,7 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog') // Import Blog object to use for MongoDB
 const User = require('../models/user') // Import User object to use for MongoDB
+const jwt = require('jsonwebtoken')
 
 // ROUTES ------
 
@@ -43,28 +44,40 @@ blogsRouter.post('/', async (request, response, next) => {
     if (!request.body.title || !request.body.url){
         return response.status(400).json({ error: 'Title and URL are required' });
     }
-
+    
     try {
-        // Get DUMMY User to put as user to the new blog 
-        // TODO: Change this later for the ACTUAL User
-        const users = await User.find({})
-        const dummyUser = users[0]
-        const dummyUserID = users[0].id
+    // Define function to get login token from the request
+    const getTokenFrom = (request) => {
+        const authorization = request.get('authorization')
+        if (authorization && authorization.startsWith('Bearer ')) {
+            return authorization.replace('Bearer ', '')
+        }
+        return null
+    }
 
+    // Verify login token
+    const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+    if (!decodedToken.id) {
+        throw new jwt.JsonWebTokenError('Invalid token')
+    }
+
+    const user = await User.findById(decodedToken.id)
+
+    
         // Create new Blog object
         const blog = new Blog({
             title: request.body.title,
             author: request.body.author,
             url: request.body.url,
             likes: request.body.likes ?? 0, //Set likes to 0 if no value is given
-            user: dummyUserID
+            user: user.id
         })
 
         // Save new blog object to DB
         const savedBlog = await blog.save()
 
         // Update the blogs array of the user
-        const updatedUser = await User.findByIdAndUpdate(dummyUserID, { $push: { blogs: savedBlog.id } }, { new: true, runValidators: true });
+        const updatedUser = await User.findByIdAndUpdate(user.id, { $push: { blogs: savedBlog.id } }, { new: true, runValidators: true });
 
         // Set response to be the savedBlog
         response.status(201).json(savedBlog)
