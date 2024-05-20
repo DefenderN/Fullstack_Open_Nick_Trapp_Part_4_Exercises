@@ -10,11 +10,43 @@ const User = require("../models/user")
 // Assign the api variable the superagent, by passing the app object to the supertest function.
 const api = supertest(app)
 
+// Helper functions
+
+/**
+ * This function simulates a user registration and login process to fetch an auth token,
+ * which can be used for subsequent API calls that require authentication.
+ *
+ * @returns {Promise<string>} A promise that resolves with the authentication token.
+ */
+const provideDummyUserToken = async () => {
+    // Setup dummy user information
+    const dummyUserInformation = {
+        username: "DefenderN3",
+        name: "Nicki",
+        password: "123456"
+      }
+
+    // Create dummyUser 
+    const dummyUserResponse = await api
+                        .post('/api/users')
+                        .send(dummyUserInformation)
+                        .expect(201)
+
+    // Login with dummyUser credentials
+    const loginResponse = await api
+                        .post('/api/login')
+                        .send({username: dummyUserInformation.username, password: dummyUserInformation.password})
+
+    // Return token from the loginResponse
+    return loginResponse.body.token
+}
+
 // Define test suite
 describe("When it comes to API calls", () => {
     // Clean up and initialize the database before each test
     beforeEach(async () => {
         await Blog.deleteMany({});
+        await User.deleteMany({});
         
         // Create an array of dummy blog entries
         const blogEntries = [
@@ -70,29 +102,9 @@ describe("When it comes to API calls", () => {
             url: "http://newblog.com",
             likes: 10
         }
-        
-        // Setup dummy user information
-        const dummyUserInformation = {
-            username: "DefenderN2",
-            name: "Nick",
-            password: "12345"
-          }
 
-        // Create dummyUser 
-        const dummyUserResponse = await api
-                            .post('/api/users')
-                            .send(dummyUserInformation)
-                            .expect(201)
-
-        const dummyUser = dummyUserResponse.body
-
-        // Login with dummyUser credentials
-        const loginResponse = await api
-                            .post('/api/login')
-                            .send({username: dummyUserInformation.username, password: dummyUserInformation.password})
-        
-        // Retrieve token
-        const token = loginResponse.body.token
+        // Create token for login (also creates a dummy user)
+        const token = await provideDummyUserToken()
 
         // POST new blog to DB using the token
         const response = await api
@@ -116,9 +128,15 @@ describe("When it comes to API calls", () => {
             author: "New Author",
             url: "http://newblog.com"
         }
+
+        // Create token for login (also creates a dummy user)
+        const token = await provideDummyUserToken()
+
         // Post dummyBlog to DB
         const response = await api
                             .post('/api/blogs')
+                            .set('Content-Type', 'application/json') // Set Content-Type header
+                            .set('Authorization', `Bearer ${token}`) // Set Authorization header
                             .send(blogWithoutLikes)
                             .expect(201)
 
@@ -174,10 +192,15 @@ describe("When it comes to API calls", () => {
             url: "http://newblog.com",
             likes: 1000000
         }
+
+        const token = await provideDummyUserToken()
+
         // 1) Add dummy blog to DB and 
         //    confirm that dummy blog was added to the DB
         const postResponse = await api
             .post('/api/blogs')
+            .set('Content-Type', 'application/json') // Set Content-Type header
+            .set('Authorization', `Bearer ${token}`) // Set Authorization header
             .send(dummyBlog)
             .expect(201)
 
@@ -219,10 +242,13 @@ describe("When it comes to API calls", () => {
             likes: 1
         }
         
+        const token = await provideDummyUserToken()
 
         // 1) Add dummy blog to DB
         const postResponse = await api
             .post('/api/blogs')
+            .set('Content-Type', 'application/json') // Set Content-Type header
+            .set('Authorization', `Bearer ${token}`) // Set Authorization header
             .send(dummyBlogWithNoLikes)
             .expect(201)
 
