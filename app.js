@@ -25,6 +25,7 @@ mongoose.connect(config.MONGODB_URI)
 // Middleware BEFORE Routes
 app.use(cors())
 app.use(express.json())
+app.use(middleware.tokenExtractor)
 app.use(middleware.requestLogger)
 
 // Routers

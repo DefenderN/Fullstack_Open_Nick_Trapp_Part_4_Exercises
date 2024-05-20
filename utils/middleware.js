@@ -16,6 +16,18 @@ const requestLogger = (request, response, next) => {
     next() // Forward the request to the next middleware
 }
 
+// Middleware to copy token from the authorization header to the token field
+// of a request.
+// Example to access the token and verify it using jwt:
+// const decodedToken = jwt.verify(request.token, process.env.SECRET)
+const tokenExtractor = (request, response, next) => {
+    const authorization = request.get('authorization')
+    if (authorization && authorization.startsWith('Bearer ')) {
+        request.token = authorization.replace('Bearer ', '')
+    }
+    next()
+}
+
 // Middleware to respond with an Unknown endpoint error
 // when an invalid url is being requested
 const unknownEndpoint = (request, response) => {
@@ -67,6 +79,7 @@ const errorHandler = (error, request, response, next) => {
 // Export statements
 module.exports = {
     requestLogger,
+    tokenExtractor,
     unknownEndpoint,
     errorHandler
 }
