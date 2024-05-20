@@ -52,6 +52,7 @@ blogsRouter.post('/', async (request, response, next) => {
         throw new jwt.JsonWebTokenError('Invalid token')
     }
 
+    // Find user in DB
     const user = await User.findById(decodedToken.id)
 
     
@@ -79,12 +80,36 @@ blogsRouter.post('/', async (request, response, next) => {
 
 // DELETE a blog
 blogsRouter.delete('/:id', async (request, response, next) => {
-     const deletedBlog = await Blog.findByIdAndDelete(request.params.id)
-        if (deletedBlog) {
-            response.status(204).end()
-        } else {
-            response.status(404).end()
+
+    try {
+        // Verify login token
+        const decodedToken = jwt.verify(request.token, process.env.SECRET)
+        if (!decodedToken.id) {
+            throw new jwt.JsonWebTokenError('Invalid token')
         }
+
+        // Find blog to be deleted
+        const blogToBeDeleted = await Blog.findById(request.params.id)
+        if (!blogToBeDeleted) {
+            return response.status(404).end(); // Blog not found
+        }
+
+        // Compare user ID of blog with the user ID of the token
+        if (!decodedToken.id === blogToBeDeleted.user.toString()) {
+            throw new Error("Blog cannot be deleted by unauthorized user")
+        }
+
+        // Delete the blog, if all checks pass
+        const deletedBlog = await Blog.findByIdAndDelete(request.params.id)
+            if (deletedBlog) {
+                response.status(204).end()
+            } else {
+                response.status(404).end()
+            }
+
+    } catch (error) {
+        next(error)
+    }
 })
 
 

@@ -19,9 +19,13 @@ const api = supertest(app)
  * @returns {Promise<string>} A promise that resolves with the authentication token.
  */
 const provideDummyUserToken = async () => {
+
+    // Generate a random number between 0 and 1000000
+    const randomNumber = Math.floor(Math.random() * 1000001);
+
     // Setup dummy user information
     const dummyUserInformation = {
-        username: "DefenderN3",
+        username: `DefenderN${randomNumber}`,
         name: "Nicki",
         password: "123456"
       }
@@ -183,7 +187,7 @@ describe("When it comes to API calls", () => {
         }
     })
 
-    test("A DELETE request deletes a blog entry", async () => {
+    test("A blog entry can only be deleted by the user who added it", async () => {
 
         // 0) Create dummy blog
         const dummyBlog = {
@@ -193,7 +197,9 @@ describe("When it comes to API calls", () => {
             likes: 1000000
         }
 
+        // Create user token
         const token = await provideDummyUserToken()
+        const anotherUserToken = await provideDummyUserToken()
 
         // 1) Add dummy blog to DB and 
         //    confirm that dummy blog was added to the DB
@@ -208,15 +214,47 @@ describe("When it comes to API calls", () => {
         const responseBlog = postResponse.body
         const dummyBlogID = responseBlog.id
 
+        // Verify the correct blog was added
         assert.strictEqual(responseBlog.title, "Dummy Blog")
         assert.strictEqual(responseBlog.author, "To be DELETED")
         assert.strictEqual(responseBlog.url, "http://newblog.com")
         assert.strictEqual(responseBlog.likes, 1000000)
 
-        // 3) Make a DELETE request for the id of the dummy blog
+        // 3.1) Make a DELETE request for the dummy blog
+        //      with no token
+        //      and expect an error
+
+        const noTokenDeleteResponse = await api
+            .delete(`/api/blogs/${dummyBlogID}`)
+            .set('Content-Type', 'application/json') // Set Content-Type header
+            .expect(401)
+
+        // 3.2) Make a DELETE request for the dummy blog
+        //      with an invalid token
+        //      and expect an error
+
+        const invalidTokenDeleteResponse = await api
+            .delete(`/api/blogs/${dummyBlogID}`)
+            .set('Content-Type', 'application/json') // Set Content-Type header
+            .set('Authorization', `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkRlZmVuZGVyTjYzMzgwIiwiaWQiOiI2NjRiYzJhNTI2ZjQwODZkYTMzODQwMmYiLCJpYXQiOjE3MTYyNDEwNjF9.UKeQTUgwRdvNDIFWXhcGp59339rx_9UtWLNArUgfSxI`) // Set Authorization header
+            .expect(401)
+
+        // 3.3) Make a DELETE request for the dummy blog
+        //      with a valid token from another user
+        //      and expect an error
+
+        const anotherUserTokenDeleteResponse = await api
+            .delete(`/api/blogs/${dummyBlogID}`)
+            .set('Content-Type', 'application/json') // Set Content-Type header
+            .set('Authorization', `Bearer ${anotherUserToken}`) // Set Authorization header
+            .expect(401)
+
+        // 3.4) Make a DELETE request for the id of the dummy blog
         //    and verify statuscode 204
         const deleteResponse = await api
             .delete(`/api/blogs/${dummyBlogID}`)
+            .set('Content-Type', 'application/json') // Set Content-Type header
+            .set('Authorization', `Bearer ${token}`) // Set Authorization header
             .expect(204)        
 
         // 4) Verify that a GET request with the id of the dummy blog

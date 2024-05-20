@@ -7,12 +7,12 @@ const config = require('./config') // Import centralized config module, e.g. han
 
 // Middleware for logging requests
 const requestLogger = (request, response, next) => {
-  if (config.APP_STATUS === 'development'){
+  //if (config.APP_STATUS === 'development'){
       logger.info('Method', request.method)
       logger.info('Path:  ', request.path)
       logger.info('Body:  ', request.body)
       logger.info('---')
-    }
+  //  }
     next() // Forward the request to the next middleware
 }
 
@@ -37,10 +37,10 @@ const unknownEndpoint = (request, response) => {
 // Middleware to handle any kind of errors,
 // e.g. from the MongoDB such as "CastError" or "ValidationError"
 const errorHandler = (error, request, response, next) => {
-    if (config.APP_STATUS === 'development'){
+    //if (config.APP_STATUS === 'development'){
       logger.error(error.name)  
       logger.error(error.message)
-    }
+    //}
   
     if (error.name === 'CastError') {
       return response.status(400).send({ error: 'malformatted id' })
@@ -54,7 +54,7 @@ const errorHandler = (error, request, response, next) => {
      else if (error.name === 'ValidationError' && error.message.includes('Name is required')) {
       return response.status(400).json({ error: 'Name is required'})
     }
-     else if (error.name === 'Error' && error.message.includes('Password must be at least 3 characters long')) {
+     else if (error.message.includes('Password must be at least 3 characters long')) {
       return response.status(400).json({ error: 'Password must be at least 3 characters'})
     }
      else if (error.name === 'ValidationError') {
@@ -70,7 +70,10 @@ const errorHandler = (error, request, response, next) => {
       return response.status(500).json({ error: 'Invalid input data provided for password hashing.' })
     } 
      else if (error.name ===  'JsonWebTokenError') {
-      return response.status(401).json({ error: 'token invalidd' })
+      return response.status(401).json({ error: `${error.message}` })
+    }
+    else if (error.message.includes('Blog cannot be deleted by unauthorized user')) {
+      return response.status(401).json({ error: `${error.message}` })
     }
 
     next(error) //Forward the error to the next middleware
