@@ -4,6 +4,7 @@
 // Import statements
 const logger = require('./logger')
 const config = require('./config') // Import centralized config module, e.g. handling environment variables
+const User = require('../models/user')
 
 // Middleware for logging requests
 const requestLogger = (request, response, next) => {
@@ -25,6 +26,21 @@ const tokenExtractor = (request, response, next) => {
     if (authorization && authorization.startsWith('Bearer ')) {
         request.token = authorization.replace('Bearer ', '')
     }
+    next()
+}
+
+// Middleware to fill the request.user field
+    const userExtractor = async (request, response, next) => {
+    
+    // Verify login token to be valid
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+
+    // get user object
+    const user = await User.findById(decodedToken.id)
+
+    // append it to the request.user field
+    request.user = user
+    
     next()
 }
 
@@ -83,6 +99,7 @@ const errorHandler = (error, request, response, next) => {
 module.exports = {
     requestLogger,
     tokenExtractor,
+    userExtractor,
     unknownEndpoint,
     errorHandler
 }

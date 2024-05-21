@@ -82,11 +82,10 @@ blogsRouter.post('/', async (request, response, next) => {
 blogsRouter.delete('/:id', async (request, response, next) => {
 
     try {
-        // Verify login token to be provided
+        // Verify login token 
         if (!request.token) {
             return response.status(401).json({ error: 'No authentication token provided' });
         }
-        // Verify login token to be valid
         const decodedToken = jwt.verify(request.token, process.env.SECRET)
         if (!decodedToken.id) {
             throw new jwt.JsonWebTokenError('Invalid token')
@@ -99,7 +98,7 @@ blogsRouter.delete('/:id', async (request, response, next) => {
         }
 
 
-        // Compare user ID of blog with the user ID of the token
+        // Compare user ID of the token with the user ID of the blog
         if (decodedToken.id !== blogToBeDeleted.user.toString()) {
             throw new Error("Blog cannot be deleted by unauthorized user")
         }
